@@ -9,11 +9,11 @@ import numpy as np
 from datetime import datetime
 #%%
 input_subID = 0
+input_session = 'prac'
+sessionID = input_session
 current_dir = os.getcwd()
 expName = 'ANT'
-#expInfo = {'subID': str(input_subID), 'sessionID': sessionID}
 expInfo = {'subID': str(input_subID)}
-expInfo['runID'] = ['1', '2','3']
 expInfo['sessionID'] = ['baseline', 'week1','week2','week3' ]
 #%%
 dlg = gui.DlgFromDict(dictionary=expInfo, title='My Experiment')
@@ -27,14 +27,14 @@ correct_responses = {
     "right": "j"
 }
 #Initialize the results file
+#%%
 results_dir = os.path.join(current_dir, 'results')
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
-runID = expInfo['runID'].zfill(2)
 subID = expInfo['subID'].zfill(3)
 sessionID = expInfo['sessionID']
 experiment_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-resultFile_name = 'sub-' + subID + '_ses-' + sessionID + '_run-' + runID + '_time-' + experiment_time
+resultFile_name = 'prac_sub-' + subID + '_time-' + experiment_time
 thisExp = data.ExperimentHandler(
     name=expName, version='0.1',
     extraInfo=expInfo, runtimeInfo=None,
@@ -43,21 +43,26 @@ thisExp = data.ExperimentHandler(
 )
 # Set the logging level to ERROR to suppress warnings
 resultFile_path = os.path.join(results_dir, resultFile_name)
+#%%
 logFile = logging.LogFile(resultFile_path+".log", level=logging.EXP)
 logging.console.setLevel(logging.ERROR)
 #%%
 # Initialize PsychoPy window
 win = visual.Window(
-    # size=(640, 480),
-    fullscr=True,
+    #size=(640, 480),
+     fullscr=True,
     screen=0, allowGUI=True, allowStencil=False,
     monitor='testMonitor',
     color="white",
     blendMode='avg', useFBO=True,
+    #units='pix'
     units='norm'
 )
 # Hide the cursor
 win.mouseVisible = False
+#win.setMouseVisible(False)
+#mouse = event.Mouse(win=win)
+#mouse.setVisible(False)
 # Get the size of the window
 win_width, win_height = win.size
 # Initialize components
@@ -90,7 +95,7 @@ trialClock = core.Clock()
 
 run_intro(win, intro_text, trigger_keyList)
 # Run IFISBlockList equivalent
-mean_rt, mean_acc = run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialClock, rt_list, acc_list, results_dir, resultFile_name, used_keyList, correct_responses)
+mean_rt, mean_acc = run_prac(win, thisExp, fixation_text, warning_image_1, target_image, trialClock, rt_list, acc_list, results_dir, resultFile_name, used_keyList, correct_responses)
 # Run Goodbye
 run_goodbye(win, goodbye_text)
 masked_rt_list = np.ma.masked_equal(rt_list, None)

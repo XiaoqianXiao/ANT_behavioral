@@ -1,5 +1,5 @@
 # ANT_behavioral
 behavioral version of ANT.
-The experiment contains four blocks. 
-The first block is for practice and takes about two minutes. 
-The other three blocks are experimental blocks and each takes about five minutes.  
+time for each practice: 4s/trial * 24 trial/run = 1.6m
+time for each run: 4s/trial * 72 trial/run = 4.8m
+3 runs in total, total time is around 20m

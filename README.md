@@ -6,6 +6,9 @@
 	- 3 runs in total, total time is around 15m
 	- 36 trials in each 3 cue * 2 target conditions
 	<img width="476" alt="image" src="https://github.com/user-attachments/assets/581bea5b-f24c-4400-ba84-f8f85772cb42">
+<img width="412" alt="image" src="https://github.com/user-attachments/assets/f9219cbd-1e9a-4d54-94e6-d2d3d0e95846">
+
+ 
 
 * __Adapt from the [e-prime short version](http://people.qc.cuny.edu/Faculty/Jin.Fan/Pages/Downloads.aspx) ([Fan et al., 2002](https://www.sciencedirect.com/science/article/abs/pii/S1053811905000984?via%3Dihub)).__
   You can find description of the short version in detail [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3526671/).

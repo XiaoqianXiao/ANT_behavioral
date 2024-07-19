@@ -7,7 +7,8 @@
 	- 36 trials in each 3 cue * 2 target conditions
 	<img width="476" alt="image" src="https://github.com/user-attachments/assets/581bea5b-f24c-4400-ba84-f8f85772cb42">
 
-* __Adapt from the [e-prime short version](http://people.qc.cuny.edu/Faculty/Jin.Fan/Pages/Downloads.aspx) ([Fan et al., 2002](https://www.sciencedirect.com/science/article/abs/pii/S1053811905000984?via%3Dihub)). You can find describtion of the short version in detail [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3526671/).__
+* __Adapt from the [e-prime short version](http://people.qc.cuny.edu/Faculty/Jin.Fan/Pages/Downloads.aspx) ([Fan et al., 2002](https://www.sciencedirect.com/science/article/abs/pii/S1053811905000984?via%3Dihub)).__
+  You can find describtion of the short version in detail [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3526671/).
 - Not using the [Fan et al., 2002 version](https://pubmed.ncbi.nlm.nih.gov/11970796/) directly since its design (see figure below) included "double cue" and "neutral target" trials which were not were interested in research of attention network nowadays.
   <img width="576" alt="image" src="https://github.com/user-attachments/assets/be9f0e76-d243-4b39-816e-1037bf6152e4">
 

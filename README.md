@@ -4,13 +4,14 @@
 	- time for each practice: 4s/trial * 24 trial/run = 1.6m
 	- time for each run: 4s/trial * 72 trial/run = 4.8m
 	- 3 runs in total, total time is around 15m
+	- 36 trials in each 3 cue * 2 target conditions
 	<img width="476" alt="image" src="https://github.com/user-attachments/assets/581bea5b-f24c-4400-ba84-f8f85772cb42">
 
 * __Adapt from the [e-prime short version](http://people.qc.cuny.edu/Faculty/Jin.Fan/Pages/Downloads.aspx) ([Fan et al., 2002](https://www.sciencedirect.com/science/article/abs/pii/S1053811905000984?via%3Dihub)).__
 - Not using the [Fan et al., 2002 version](https://pubmed.ncbi.nlm.nih.gov/11970796/) directly since its design (see figure below) included "double cue" and "neutral target" trials which were not were interested in research of attention network nowadays.
   <img width="576" alt="image" src="https://github.com/user-attachments/assets/be9f0e76-d243-4b39-816e-1037bf6152e4">
 
-- 3 runs in total and each run has 72 trails
+- 3 runs in total * 72 trails/run [the original one is 3 runs * 48 trails/run]
 - Simplify the instruction
 	- in original e-prime version:
 	- "Welcome to Attention Experiment\nPress a button to continue. \n\nPress and hold all 5 buttons to contact Technologist."

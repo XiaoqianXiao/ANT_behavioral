@@ -14,7 +14,7 @@ expName = 'ANT'
 #expInfo = {'subID': str(input_subID), 'sessionID': sessionID}
 expInfo = {'subID': str(input_subID)}
 expInfo['runID'] = ['1', '2','3']
-expInfo['sessionID'] = ['baseline', 'week1','week2','week3' ]
+expInfo['sessionID'] = ['Baseline','Repeat_Baseline','T3','T6','T9','T12']
 #%%
 dlg = gui.DlgFromDict(dictionary=expInfo, title='My Experiment')
 if dlg.OK == False:

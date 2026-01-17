@@ -1,5 +1,5 @@
 # ANT_behavioral
-* [PsychoPy 2024.1.5](https://github.com/psychopy/psychopy/releases/tag/2024.1.5) was used while design the task
+* [PsychoPy 2024.1.5](https://github.com/psychopy/psychopy/releases/tag/2024.1.5) was used while design the task (scroll to the bottom of this link to download)
 * __About this ANT version:__
 	- behavioral version of ANT.
 	- time for each practice: 4s/trial * 24 trial/run = 1.6m

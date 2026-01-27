@@ -3,16 +3,14 @@ import os
 import pandas as pd
 import numpy as np
 
-def init_intro(win, screen_height):
+def init_intro(win, inst_height):
     return visual.TextStim(win, 
-        text="Please press F for LEFT arrows and J for RIGHT arrows.",
-        height=screen_height * 0.08, # Adaptive font size
-        wrapWidth=screen_height * 2, 
-        color="white", pos=(0, 0))
+        text="Press F for LEFT ( < ) and J for RIGHT ( > ).\n\nPress SPACE or S to start.",
+        height=inst_height, wrapWidth=25, color="white", pos=(0, 0))
 
-def init_goodbye(win, screen_height):
-    return visual.TextStim(win, text="Task Complete.", 
-                           height=screen_height * 0.08, color="white")
+def init_goodbye(win, inst_height):
+    return visual.TextStim(win, text="Task Complete. Please wait...", 
+                           height=inst_height, color="white")
 
 def run_intro(win, intro_text, trigger_keyList):
     intro_text.draw()
@@ -28,27 +26,29 @@ def run_goodbye(win, goodbye_text):
 def run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialClock, rt_list, acc_list, results_dir, resultFile_name, used_keyList, correct_responses):
     current_dir = os.getcwd()
     stim_dir = os.path.join(current_dir, 'experiment_design', 'stimuli')
-    stimList = pd.read_csv(os.path.join(current_dir, 'experiment_design', 'stim_lists', 'run-all.csv'))
+    stim_list_path = os.path.join(current_dir, 'experiment_design', 'stim_lists', 'run-all.csv')
     
-    # --- ADAPTIVE POSITION MATH ---
-    screen_h = win.size[1]
-    # Place stimuli at 25% of the screen height away from the center
-    stimList['TargetPos_deg'] = np.where(stimList['TargetPosition'] > 0, screen_h * 0.25, screen_h * -0.25)
-    stimList['CuePos_deg'] = np.where(stimList['CuePositionY'] > 0, screen_h * 0.25, screen_h * -0.25)
+    if not os.path.exists(stim_list_path):
+        print(f"Error: Could not find {stim_list_path}")
+        core.quit()
+        
+    stimList = pd.read_csv(stim_list_path)
     
-    # Trial timing logic (4 seconds per trial)
-    stimList['abs_onset'] = np.cumsum([0] + [4.0] * (len(stimList)-1))
+    # Position Math: Moving them 4 degrees up/down is standard for ANT
+    stimList['TargetPos_deg'] = np.where(stimList['TargetPosition'] > 0, 4.0, -4.0)
+    stimList['CuePos_deg'] = np.where(stimList['CuePositionY'] > 0, 4.0, -4.0)
+    
     trialClock.reset()
 
     for index, row in stimList.iterrows():
         trial = row.to_dict()
         
-        # Timing sync
-        while trialClock.getTime() < trial['abs_onset']:
-            fixation_text.draw()
-            win.flip()
+        # 1. Baseline Fixation
+        fixation_text.draw()
+        win.flip()
+        core.wait(getAttrib(trial, "DurationOfFixation") / 1000)
 
-        # Warning
+        # 2. Warning Cue
         warning_image_1.setImage(os.path.join(stim_dir, "symbolstarbig.bmp"))
         warning_image_1.setPos((0, trial['CuePos_deg']))
         warning_image_1.draw()
@@ -56,12 +56,12 @@ def run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialC
         win.flip()
         core.wait(0.1)
 
-        # Target
-        target_wait = trialClock.getTime() + 0.4 # 400ms delay after cue
-        while trialClock.getTime() < target_wait:
-            fixation_text.draw()
-            win.flip()
+        # 3. Post-cue Fixation
+        fixation_text.draw()
+        win.flip()
+        core.wait(getAttrib(trial, "IntervalBetweenCueAndTarget") / 1000)
 
+        # 4. Target Slide
         target_image.setImage(os.path.join(stim_dir, trial['TargetImage'] + ".bmp"))
         target_image.setPos((0, trial['TargetPos_deg']))
         target_image.draw()
@@ -84,4 +84,12 @@ def run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialC
         thisExp.addData('acc', acc)
         thisExp.nextEntry()
 
-    return np.mean(acc_list), np.mean([r for r in rt_list if r])
+    # Mask None values for mean calculation
+    valid_rts = [r for r in rt_list if r is not None]
+    m_rt = np.mean(valid_rts) if valid_rts else 0
+    m_acc = np.mean(acc_list) if acc_list else 0
+    
+    return m_acc, m_rt
+
+def getAttrib(dict_obj, key):
+    return dict_obj.get(key, 0)

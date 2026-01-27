@@ -7,17 +7,26 @@ from datetime import datetime
 
 #%%
 # --- MONITOR CALIBRATION ---
-MON_WIDTH = 70       # Physical width of monitor in cm
-MON_DISTANCE = 60    # Distance from eyes to monitor in cm
+# If things are too small, DECREASE MON_DISTANCE.
+# If things are too big, INCREASE MON_DISTANCE.
+MON_WIDTH = 70       
+MON_DISTANCE = 50    # Distance in cm (reduced to make things look larger)
 MON_SIZE = [1920, 1080] 
+
+# --- STIMULUS PARAMETERS (Fixed Degrees - High Visibility) ---
+# These are the numbers you should change to adjust size manually
+FIX_H = 2.0         # Height of fixation cross
+TARG_SIZE = (12.0, 3.5) # Width, Height of arrows
+WARN_S = 2.5        # Size of the star/cue
+INST_H = 1.2        # Font size
 
 #%%
 input_subID = 0
 current_dir = os.getcwd()
 expName = 'ANT'
-expInfo = {'subID': str(input_subID), 'runID': ['1', '2', '3'], 'sessionID': ['T1', 'T2']}
+expInfo = {'subID': str(input_subID), 'runID': '1'}
 
-dlg = gui.DlgFromDict(dictionary=expInfo, title='Adaptive ANT')
+dlg = gui.DlgFromDict(dictionary=expInfo, title='Attention Network Test')
 if dlg.OK == False: core.quit()
 
 # --- FILENAME SETUP ---
@@ -33,34 +42,33 @@ thisExp = data.ExperimentHandler(name=expName, extraInfo=expInfo, savePickle=Tru
 my_monitor = monitors.Monitor('testMonitor', width=MON_WIDTH, distance=MON_DISTANCE)
 my_monitor.setSizePix(MON_SIZE)
 
-win = visual.Window(monitor=my_monitor, fullscr=True, color=(-1, -1, -1), units='deg')
+# Using a standard grey background for better visibility of all stimuli
+win = visual.Window(
+    monitor=my_monitor, 
+    fullscr=True, 
+    color=(0, 0, 0), # Neutral Grey (using 0 to 1 scale or -1 to 1 depending on version)
+    colorSpace='rgb',
+    units='deg'
+)
 win.mouseVisible = False
-
-# --- ADAPTIVE SIZE LOGIC (Proportional to Screen Height) ---
-screen_height_deg = win.size[1]
-
-# Set sizes as percentages of screen height
-FIX_H  = screen_height_deg * 0.10   # 10% of screen height
-TARG_H = screen_height_deg * 0.25   # 25% of screen height
-TARG_W = TARG_H * 4.0               # Maintain 4:1 aspect ratio
-WARN_S = screen_height_deg * 0.15   # 15% of screen height
 
 # --- STIMULI INITIALIZATION ---
 fixation_text = visual.TextStim(win, text="+", height=FIX_H, color='white', bold=True)
 warning_image_1 = visual.ImageStim(win, size=(WARN_S, WARN_S))
-target_image = visual.ImageStim(win, size=(TARG_W, TARG_H))
+target_image = visual.ImageStim(win, size=TARG_SIZE)
 
 # Instructions
-intro_text = init_intro(win, screen_height_deg) 
-goodbye_text = init_goodbye(win, screen_height_deg)
+intro_text = init_intro(win, INST_H) 
+goodbye_text = init_goodbye(win, INST_H)
 
 rt_list, acc_list = [], []
 trialClock = core.Clock()
 
 #%%
 # --- EXECUTION ---
-run_intro(win, intro_text, ['s'])
+run_intro(win, intro_text, ['s', 'space'])
 
+# Behavioral task
 mean_rt, mean_acc = run_behav(
     win, thisExp, fixation_text, warning_image_1, target_image, 
     trialClock, rt_list, acc_list, results_dir, resultFile_name, 

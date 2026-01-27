@@ -9,31 +9,33 @@ def getAttrib(trialAttributes, attr):
     return trialAttributes[attr]
 
 def init_intro(win, win_width):
-    # 'Initializing' appeared because the previous code used a placeholder.
-    # Updated height to ~0.8 degrees (standard reading size)
-    # Updated wrapWidth to 20 degrees (standard reading column width)
-    intro_text = visual.TextStim(win, 
-                                 text="Please press left point finger when the central arrowhead points left \n \nand press right pointing finger when the central arrowhead points right",
-                                 height=0.8,  
-                                 bold=False,
-                                 wrapWidth=20, 
-                                 font='DejaVu Sans',
-                                 pos=(0, 0),
-                                 color="black")
-    return intro_text
+    return visual.TextStim(win, 
+        text="Please press left point finger when the central arrowhead points left \n \nand press right pointing finger when the central arrowhead points right",
+        height=1.0, 
+        wrapWidth=20, # Text wraps after 20 degrees
+        font='DejaVu Sans',
+        pos=(0, 0),
+        color="black")
 
 def init_goodbye(win, win_width):
-    goodbye_text = visual.TextStim(win, 
-                                   text="Thank-you for your attention. \n \nThis task is complete. Please wait.",
-                                   height=0.8,
-                                   bold=False,
-                                   wrapWidth=20,
-                                   font='DejaVu Sans',
-                                   pos=(0, 0),
-                                   color="black")
-    return goodbye_text
+    return visual.TextStim(win, 
+        text="Thank-you for your attention. \n \nThis task is complete. Please wait.",
+        height=1.0, 
+        wrapWidth=20,
+        font='DejaVu Sans',
+        pos=(0, 0),
+        color="black")
 
-# ... [run_intro and run_goodbye remain the same] ...
+def run_intro(win, intro_text, trigger_keyList):
+    intro_text.draw()
+    win.flip()
+    event.waitKeys(keyList=trigger_keyList, clearEvents=True)
+    core.wait(0.5)
+
+def run_goodbye(win, goodbye_text):
+    goodbye_text.draw()
+    win.flip()
+    core.wait(2.0)
 
 def run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialClock, rt_list, acc_list, results_dir, resultFile_name, used_keyList, correct_responses):
     current_dir = os.getcwd()
@@ -42,50 +44,63 @@ def run_behav(win, thisExp, fixation_text, warning_image_1, target_image, trialC
     stim_dir = os.path.join(current_dir, 'experiment_design', 'stimuli')
     stimList = pd.read_csv(stimList_dir)
     
-    # CRITICAL: Re-calculate positions for Degrees of Visual Angle
-    # In your old code, you divided by 240 to get a ratio for 'norm'.
-    # For 'deg', we usually want small offsets (e.g., 1 or 2 degrees up/down).
-    # If your CSV 'TargetPosition' is in pixels, we convert it here:
-    # This logic assumes 0 is center, and values like 50 are pixels.
-    # Adjust the '45' (pixels per degree) based on your MON_SIZE and MON_WIDTH
-    pix_to_deg = 45 
-    
-    stimList['TargetPosition_center0'] = (stimList['TargetPosition'] / pix_to_deg)
-    stimList['CuePositionY_center0'] = (stimList['CuePositionY'] / pix_to_deg)
+    # --- Degree-based Position Math ---
+    # Assuming CSV values are pixels (e.g. 240, -240). 
+    # Dividing by 50 moves the stimulus ~4.8 degrees from center.
+    DEG_SCALE = 50 
+    stimList['TargetPos_deg'] = (240 - stimList['TargetPosition']) / DEG_SCALE
+    stimList['CuePos_deg'] = (240 - stimList['CuePositionY']) / DEG_SCALE
 
     trials = stimList.sample(frac=1).reset_index(drop=True)
     trialClock.reset()
-    
+
     for index, row in trials.iterrows():
         trialAttributes = row.to_dict()
-        # [Log Data as before...]
         
-        # Fixation start
-        fixation_text.setAutoDraw(True)
+        # 1. First Fixation
+        fixation_text.draw()
         win.flip()
         core.wait(getAttrib(trialAttributes, "DurationOfFixation") / 1000)
-        fixation_text.setAutoDraw(False)
 
-        # Warning slide
+        # 2. Cue/Warning
         warning_image_1.setImage(os.path.join(stim_dir, "symbolstarbig.bmp"))
-        # Using the new degree-based position
-        warning_image_1.setPos((0, getAttrib(trialAttributes, "CuePositionY_center0")))
+        warning_image_1.setPos((0, getAttrib(trialAttributes, "CuePos_deg")))
         warning_image_1.draw()
-        fixation_text.draw() # Keep fixation visible during cue
+        fixation_text.draw()
         win.flip()
         core.wait(0.1)
 
-        # Middle fixation
+        # 3. Middle Fixation
         fixation_text.draw()
         win.flip()
         core.wait(getAttrib(trialAttributes, "IntervalBetweenCueAndTarget") / 1000)
 
-        # Target slide
+        # 4. Target (Arrows)
         target_image.setImage(os.path.join(stim_dir, getAttrib(trialAttributes, "TargetImage") + ".bmp"))
-        target_image.setPos((0, getAttrib(trialAttributes, "TargetPosition_center0")))
+        target_image.setPos((0, getAttrib(trialAttributes, "TargetPos_deg")))
         target_image.draw()
         fixation_text.draw()
         win.flip()
+        target_onsetTime = trialClock.getTime()
+
+        # 5. Response
+        keys = event.waitKeys(maxWait=getAttrib(trialAttributes, "DurationOfTarget")/1000, 
+                             keyList=used_keyList, timeStamped=trialClock)
         
-        # [Response collection and data logging as before...]
-        # Ensure the rest of your timing and logging logic follows
+        acc = 0
+        rt = None
+        if keys:
+            response, reaction_time = keys[0]
+            if response == 'escape': core.quit()
+            rt = reaction_time - target_onsetTime
+            acc = 1 if response == correct_responses[trialAttributes['TargetDirection']] else 0
+        
+        rt_list.append(rt)
+        acc_list.append(acc)
+        
+        # Logging
+        thisExp.addData('RT', rt)
+        thisExp.addData('ACC', acc)
+        thisExp.nextEntry()
+
+    return np.mean(acc_list), np.mean(rt_list)
